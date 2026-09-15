@@ -10,6 +10,11 @@
 
 <div th:text="${mensagem}" style="color: red"></div>
 
+<form th:action="@{/correntistas/form}" method="GET">
+    <button class="btn btn-primary" type="submit">Novo</button>
+</form>
+<br />
+
 <table border="1">
     <thead>
     <tr>

@@ -1,37 +1,49 @@
 package br.edu.ifpb.pweb2.bitbank.controller;
 
 import br.edu.ifpb.pweb2.bitbank.model.Correntista;
-import br.edu.ifpb.pweb2.bitbank.repository.CorrentistaRepository;
+import br.edu.ifpb.pweb2.bitbank.service.CorrentistaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/correntistas")
 public class CorrentistaController {
 
     @Autowired
-    private CorrentistaRepository correntistaRepository;
+    private CorrentistaService correntistaService;
 
-    @RequestMapping("/form")
-    public String getForm(Correntista correntista, Model model) {
-        model.addAttribute("correntista", correntista);
-        return "correntistas/form";
+    @GetMapping("/form")
+    public ModelAndView getForm(ModelAndView modelAndView) {
+        modelAndView.setViewName("correntistas/form");
+        modelAndView.addObject("correntista", new Correntista());
+        return modelAndView;
     }
 
-    @RequestMapping("/save")
-    public String save(Correntista correntista, Model model) {
+    @PostMapping({"", "/save"})
+    public ModelAndView save(Correntista correntista, ModelAndView modelAndView) {
         String erro = validar(correntista);
         if (erro != null) {
-            model.addAttribute("mensagem", erro);
-            model.addAttribute("correntista", correntista);
-            return "correntistas/form";
+            modelAndView.setViewName("correntistas/form");
+            modelAndView.addObject("mensagem", erro);
+            modelAndView.addObject("correntista", correntista);
+            return modelAndView;
         }
 
-        correntistaRepository.save(correntista);
-        model.addAttribute("correntistas", correntistaRepository.findAll());
-        return "correntistas/list";
+        correntistaService.save(correntista);
+        modelAndView.setViewName("correntistas/list");
+        modelAndView.addObject("correntistas", correntistaService.findAll());
+        return modelAndView;
+    }
+
+    @GetMapping({"", "/list"})
+    public ModelAndView list(ModelAndView modelAndView) {
+        modelAndView.setViewName("correntistas/list");
+        modelAndView.addObject("correntistas", correntistaService.findAll());
+        return modelAndView;
     }
 
     private String validar(Correntista correntista) {

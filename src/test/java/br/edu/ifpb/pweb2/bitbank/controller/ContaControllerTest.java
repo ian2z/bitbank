@@ -5,6 +5,7 @@ import br.edu.ifpb.pweb2.bitbank.model.Correntista;
 import br.edu.ifpb.pweb2.bitbank.repository.ContaRepository;
 import br.edu.ifpb.pweb2.bitbank.repository.CorrentistaRepository;
 import br.edu.ifpb.pweb2.bitbank.service.ContaService;
+import br.edu.ifpb.pweb2.bitbank.service.CorrentistaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +20,7 @@ class ContaControllerTest {
 
     private ContaController controller;
     private ContaService contaService;
+    private CorrentistaService correntistaService;
     private CorrentistaRepository correntistaRepository;
     private ContaRepository contaRepository;
 
@@ -27,6 +29,11 @@ class ContaControllerTest {
         controller = new ContaController();
         correntistaRepository = new CorrentistaRepository();
         contaRepository = new ContaRepository();
+
+        correntistaService = new CorrentistaService();
+        Field cRepo = CorrentistaService.class.getDeclaredField("correntistaRepository");
+        cRepo.setAccessible(true);
+        cRepo.set(correntistaService, correntistaRepository);
 
         contaService = new ContaService();
         Field ctRepo = ContaService.class.getDeclaredField("contaRepository");
@@ -41,9 +48,9 @@ class ContaControllerTest {
         ctrlContaService.setAccessible(true);
         ctrlContaService.set(controller, contaService);
 
-        Field ctrlCorrRepo = ContaController.class.getDeclaredField("correntistaRepository");
-        ctrlCorrRepo.setAccessible(true);
-        ctrlCorrRepo.set(controller, correntistaRepository);
+        Field ctrlCorrService = ContaController.class.getDeclaredField("correntistaService");
+        ctrlCorrService.setAccessible(true);
+        ctrlCorrService.set(controller, correntistaService);
     }
 
     @Test
@@ -59,7 +66,7 @@ class ContaControllerTest {
         correntista.setNome("Maria");
         correntista.setEmail("maria@email.com");
         correntista.setSenha("123");
-        correntistaRepository.save(correntista);
+        correntistaService.save(correntista);
 
         Conta conta = new Conta();
         conta.setNumero("1111");

@@ -8,7 +8,7 @@
 <body>
 <h1 class="mb-3">Cadastro de Conta</h1>
 
-<form th:action="@{/contas/save}" method="POST" th:object="${conta}">
+<form th:action="@{/contas}" method="POST" th:object="${conta}">
     <input type="hidden" th:field="*{id}" />
 
     <label for="correntista">Número</label>
@@ -26,7 +26,7 @@
     <hr>
 
     <button type="submit">Salvar</button>
-    <a th:href="@{/contas/list}">Cancelar</a>
+    <a th:href="@{/contas}">Cancelar</a>
 </form>
 </body>
 

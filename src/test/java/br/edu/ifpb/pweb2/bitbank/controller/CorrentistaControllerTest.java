@@ -2,28 +2,56 @@ package br.edu.ifpb.pweb2.bitbank.controller;
 
 import br.edu.ifpb.pweb2.bitbank.model.Correntista;
 import br.edu.ifpb.pweb2.bitbank.repository.CorrentistaRepository;
+import br.edu.ifpb.pweb2.bitbank.service.CorrentistaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CorrentistaControllerTest {
 
     private CorrentistaController controller;
+    private CorrentistaService service;
     private CorrentistaRepository repository;
 
     @BeforeEach
     void setUp() throws Exception {
         controller = new CorrentistaController();
         repository = new CorrentistaRepository();
+        service = new CorrentistaService();
 
-        Field repoField = CorrentistaController.class.getDeclaredField("correntistaRepository");
-        repoField.setAccessible(true);
-        repoField.set(controller, repository);
+        Field repoInService = CorrentistaService.class.getDeclaredField("correntistaRepository");
+        repoInService.setAccessible(true);
+        repoInService.set(service, repository);
+
+        Field serviceInCtrl = CorrentistaController.class.getDeclaredField("correntistaService");
+        serviceInCtrl.setAccessible(true);
+        serviceInCtrl.set(controller, service);
+    }
+
+    @Test
+    void testGetForm() {
+        ModelAndView mav = controller.getForm(new ModelAndView());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertNotNull(mav.getModel().get("correntista"));
+    }
+
+    @Test
+    void testList() {
+        Correntista c = new Correntista();
+        c.setNome("Carlos");
+        c.setEmail("carlos@email.com");
+        c.setSenha("123456");
+        service.save(c);
+
+        ModelAndView mav = controller.list(new ModelAndView());
+        assertEquals("correntistas/list", mav.getViewName());
+        List<?> list = (List<?>) mav.getModel().get("correntistas");
+        assertEquals(1, list.size());
     }
 
     @Test
@@ -33,13 +61,12 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/list", view);
-        assertNull(model.getAttribute("mensagem"));
-        assertNotNull(model.getAttribute("correntistas"));
-        assertEquals(1, repository.findAll().size());
+        assertEquals("correntistas/list", mav.getViewName());
+        assertNull(mav.getModel().get("mensagem"));
+        assertNotNull(mav.getModel().get("correntistas"));
+        assertEquals(1, service.findAll().size());
     }
 
     @Test
@@ -49,12 +76,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Nome do correntista é obrigatório", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Nome do correntista é obrigatório", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -64,12 +90,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Nome do correntista é obrigatório", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Nome do correntista é obrigatório", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -79,12 +104,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Nome do correntista deve ter tamanho máximo de 50 caracteres", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Nome do correntista deve ter tamanho máximo de 50 caracteres", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -94,12 +118,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/list", view);
-        assertNull(model.getAttribute("mensagem"));
-        assertEquals(1, repository.findAll().size());
+        assertEquals("correntistas/list", mav.getViewName());
+        assertNull(mav.getModel().get("mensagem"));
+        assertEquals(1, service.findAll().size());
     }
 
     @Test
@@ -109,12 +132,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha(null);
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Senha é obrigatória", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Senha é obrigatória", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -124,12 +146,11 @@ class CorrentistaControllerTest {
         c.setEmail("joao@email.com");
         c.setSenha("   ");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Senha é obrigatória", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Senha é obrigatória", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -139,12 +160,11 @@ class CorrentistaControllerTest {
         c.setEmail(null);
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Email é obrigatório", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Email é obrigatório", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 
     @Test
@@ -154,11 +174,10 @@ class CorrentistaControllerTest {
         c.setEmail("   ");
         c.setSenha("123456");
 
-        Model model = new ConcurrentModel();
-        String view = controller.save(c, model);
+        ModelAndView mav = controller.save(c, new ModelAndView());
 
-        assertEquals("correntistas/form", view);
-        assertEquals("Email é obrigatório", model.getAttribute("mensagem"));
-        assertEquals(0, repository.findAll().size());
+        assertEquals("correntistas/form", mav.getViewName());
+        assertEquals("Email é obrigatório", mav.getModel().get("mensagem"));
+        assertEquals(0, service.findAll().size());
     }
 }
