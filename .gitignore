@@ -35,3 +35,4 @@ build/
 .cmd
 /mvnw
 /mvnw.cmd
+/src/test
