@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/correntistas")
@@ -24,19 +25,18 @@ public class CorrentistaController {
     }
 
     @PostMapping({"", "/save"})
-    public ModelAndView save(Correntista correntista, ModelAndView modelAndView) {
+    public ModelAndView save(Correntista correntista, RedirectAttributes redirectAttributes) {
         String erro = validar(correntista);
         if (erro != null) {
-            modelAndView.setViewName("correntistas/form");
+            ModelAndView modelAndView = new ModelAndView("correntistas/form");
             modelAndView.addObject("mensagem", erro);
             modelAndView.addObject("correntista", correntista);
             return modelAndView;
         }
 
         correntistaService.save(correntista);
-        modelAndView.setViewName("correntistas/list");
-        modelAndView.addObject("correntistas", correntistaService.findAll());
-        return modelAndView;
+        redirectAttributes.addFlashAttribute("mensagem", "Correntista salvo com sucesso!");
+        return new ModelAndView ("redirect:/correntistas");
     }
 
     @GetMapping({"", "/list"})
